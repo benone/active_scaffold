@@ -24,7 +24,6 @@ module ActionController #:nodoc:
       assign_names_without_active_scaffold
       @template.view_paths.active_scaffold_paths = self.class.active_scaffold_paths if search_generic_view_paths?
     end
-    alias_method_chain :assign_names, :active_scaffold
 
     def search_generic_view_paths?
       !self.is_a?(ActionMailer::Base) && self.class.action_methods.include?(self.action_name)

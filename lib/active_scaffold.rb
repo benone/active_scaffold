@@ -1,3 +1,4 @@
+require File.dirname(__FILE__) + '/../init'
 module ActiveScaffold
   class ControllerNotFound < RuntimeError; end
   class DependencyFailure < RuntimeError; end
@@ -6,8 +7,17 @@ module ActiveScaffold
   class ActionNotAllowed < SecurityError; end
   class ReverseAssociationRequired < RuntimeError; end
 
+  ROOT = File.join(File.dirname(__FILE__), '..')
+
   def self.included(base)
-    base.extend(ClassMethods)
+    base.class_eval do
+      extend ActiveScaffold::ClassMethods
+      include RespondsToParent
+      include ActiveScaffold::Helpers::ControllerHelpers
+      include ActiveRecordPermissions::ModelUserAccess::Controller
+      alias_method_chain :assign_names, :active_scaffold
+      alias_method_chain :render, :active_scaffold
+    end
     base.module_eval do
       # TODO: these should be in actions/core
       before_filter :handle_user_settings
@@ -66,10 +76,10 @@ module ActiveScaffold
       @active_scaffold_overrides.uniq! # Fix rails duplicating some view_paths
       @active_scaffold_frontends = []
       if active_scaffold_config.frontend.to_sym != :default
-        active_scaffold_custom_frontend_path = File.join(Rails.root, 'vendor', 'plugins', ActiveScaffold::Config::Core.plugin_directory, 'frontends', active_scaffold_config.frontend.to_s , 'views')
+        active_scaffold_custom_frontend_path = File.join(ActiveScaffold::ROOT, 'frontends', active_scaffold_config.frontend.to_s , 'views')
         @active_scaffold_frontends << active_scaffold_custom_frontend_path
       end
-      active_scaffold_default_frontend_path = File.join(Rails.root, 'vendor', 'plugins', ActiveScaffold::Config::Core.plugin_directory, 'frontends', 'default' , 'views')
+      active_scaffold_default_frontend_path =  File.join(ActiveScaffold::ROOT, 'frontends', 'default' , 'views')
       @active_scaffold_frontends << active_scaffold_default_frontend_path
       @active_scaffold_custom_paths = []
 
