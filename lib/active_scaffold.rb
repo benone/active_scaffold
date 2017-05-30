@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/../init'
 module ActiveScaffold
+  require File.dirname(__FILE__) + '/../init'
   class ControllerNotFound < RuntimeError; end
   class DependencyFailure < RuntimeError; end
   class MalformedConstraint < RuntimeError; end
